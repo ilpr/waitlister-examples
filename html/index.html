@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waitlist Signup</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 400px; margin: 4rem auto; padding: 1rem; }
+    input, button { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 6px; font-size: 16px; }
+    input { border: 1px solid #ddd; }
+    button { background: #000; color: #fff; border: none; cursor: pointer; }
+    button:disabled { opacity: 0.5; }
+    .message { padding: 12px; border-radius: 6px; text-align: center; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h1>Join the Waitlist</h1>
+  
+  <form id="waitlist-form">
+    <input type="email" name="email" placeholder="Your email" required>
+    <input type="text" name="name" placeholder="Your name (optional)">
+    <button type="submit">Join Waitlist</button>
+  </form>
+  
+  <div id="message"></div>
+
+  <script>
+    const WAITLIST_KEY = 'YOUR_WAITLIST_KEY';
+    const form = document.getElementById('waitlist-form');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Joining...';
+
+      try {
+        const res = await fetch(`https://waitlister.me/s/${WAITLIST_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(form))
+        });
+
+        if (res.ok) {
+          message.className = 'message success';
+          message.textContent = "You're on the list!";
+          form.reset();
+        } else {
+          throw new Error();
+        }
+      } catch {
+        message.className = 'message error';
+        message.textContent = 'Something went wrong. Try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Join Waitlist';
+      }
+    });
+  </script>
+</body>
+</html>
